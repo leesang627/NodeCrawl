@@ -24,8 +24,15 @@ fs.readdir('screenshot',(err) => {
 const crawler = async () => {
   try{
     const result = [];
-    const browser = await puppeteer.launch({headless: process.env.NODE_ENV === 'production'});
+    const browser = await puppeteer.launch({
+      headless: process.env.NODE_ENV === 'production',
+      args: ['--window-size=1920,1080'],
+    });
     const page = await browser.newPage();
+    await page.setViewport({
+      width: 1920,
+      height: 1080,
+    });
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36');
     for (const [ i, r ] of records.entries()){
       await page.goto(r[1]);
@@ -50,6 +57,15 @@ const crawler = async () => {
         result[i] = [r[0],r[1],data.score.trim()];
       }
       if(data.img) {
+        await page.screenshot({
+          path: `screenshot/${r[0]}.jpg`,
+          clip: {
+            x: 100,
+            y: 100,
+            width: 300,
+            height: 300,
+          },
+        });
         const imgData = await axios.get(data.img.replace(/\?.*$/, ''), {
           responseType: "arraybuffer",
         });
