@@ -1,10 +1,25 @@
 const parse = require('csv-parse/lib/sync');
 const stringify = require('csv-stringify/lib/sync');
 const fs = require('fs');
+const axios = require('axios');
 const puppeteer = require('puppeteer');
 
 const csv = fs.readFileSync('csv/data.csv');
 const records = parse(csv.toString('utf-8'));
+
+fs.readdir('poster',(err) => {
+  if(err){
+    console.error('포스터 폴더가 없어 포스트 폴더 생성');
+    fs.mkdirSync('poster');
+  }
+});
+
+fs.readdir('screenshot',(err) => {
+  if(err){
+    console.error('스크린샷 폴더가 없어 스크린샷 폴더 생성');
+    fs.mkdirSync('screenshot');
+  }
+});
 
 const crawler = async () => {
   try{
@@ -14,15 +29,31 @@ const crawler = async () => {
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36');
     for (const [ i, r ] of records.entries()){
       await page.goto(r[1]);
-      const text = await page.evaluate(() => {
-        const score = document.querySelector('.score.score_left .star_score');
-        if(score) {
-          return score.textContent;
+      const data = await page.evaluate(() => {
+        const scoreEl = document.querySelector('.score.score_left .star_score');
+        let score = '';
+        if(scoreEl) {
+          score = scoreEl.textContent;
         }
+        const imgEl = document.querySelector('.poster img');
+        let img = '';
+        if(imgEl) {
+          img = imgEl.src;
+        }
+        return {
+          score,
+          img,
+        };
       });
-      if(text) {
-        console.log(r[0],'평점',text.trim());
-        result[i] = [r[0],r[1],text.trim()];
+      if(data.score) {
+        console.log(r[0],'평점',data.score.trim());
+        result[i] = [r[0],r[1],data.score.trim()];
+      }
+      if(data.img) {
+        const imgData = await axios.get(data.img.replace(/\?.*$/, ''), {
+          responseType: "arraybuffer",
+        });
+        fs.writeFileSync(`poster/${r[0]}.jpg`, imgData.data);
       }
       await page.waitFor(1000);
     }
