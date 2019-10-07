@@ -16,11 +16,18 @@ const crawler = async () => {
     await page.goto('https://www.facebook.com');
     const id = process.env.EMAIL;
     const password = process.env.PASSWORD;
-    await page.evaluate((id, password) => {
+    /*await page.evaluate((id, password) => {
       document.querySelector('#email').value = id;
       document.querySelector('#pass').value = password;
       document.querySelector('#loginbutton').click();
-    }, id, password)
+    }, id, password);*/
+    await page.type('#email', process.env.EMAIL,{delay: 50});
+    await page.type('#pass', process.env.PASSWORD,{delay: 50});
+    await page.hover('#loginbutton');
+    await page.waitFor(2000);
+    await page.click('#loginbutton');
+    await page.waitFor(10000);
+    await page.keyboard.press('Escape');
 
   } catch (e) {
     console.error(e);
