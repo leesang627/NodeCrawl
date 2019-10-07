@@ -21,17 +21,20 @@ const crawler = async () => {
       document.querySelector('#pass').value = password;
       document.querySelector('#loginbutton').click();
     }, id, password);*/
-    await page.type('#email', process.env.EMAIL,{delay: 50});
-    await page.type('#pass', process.env.PASSWORD,{delay: 50});
+    await page.type('#email', process.env.EMAIL);
+    await page.type('#pass', process.env.PASSWORD);
     await page.hover('#loginbutton');
     await page.waitFor(2000);
     await page.click('#loginbutton');
-    await page.waitFor(10000);
+    await page.waitForResponse((res) => {
+      console.log(res.url());
+      return res.url().includes('login_attempt');
+    });
+    await page.waitFor(3000);
     await page.keyboard.press('Escape');
-    await page.waitFor(3000);
-    await page.click('#userNavigationLabel');
-    await page.waitFor(3000);
-    await page.click('li.navSubmenu:last-child');
+    // await page.waitFor(3000);
+    // await page.click('#userNavigationLabel');
+    // await page.click('li.navSubmenu:last-child');
 
   } catch (e) {
     console.error(e);
