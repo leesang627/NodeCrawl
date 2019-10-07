@@ -28,6 +28,10 @@ const crawler = async () => {
     await page.click('#loginbutton');
     await page.waitFor(10000);
     await page.keyboard.press('Escape');
+    await page.waitFor(3000);
+    await page.click('#userNavigationLabel');
+    await page.waitFor(3000);
+    await page.click('li.navSubmenu:last-child');
 
   } catch (e) {
     console.error(e);
