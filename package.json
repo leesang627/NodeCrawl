@@ -13,6 +13,8 @@
     "csv-parse": "^4.4.5",
     "csv-stringify": "^5.3.3",
     "dotenv": "^8.1.0",
-    "puppeteer": "^1.19.0"
+    "mysql2": "^1.7.0",
+    "puppeteer": "^1.19.0",
+    "sequelize": "^5.19.4"
   }
 }

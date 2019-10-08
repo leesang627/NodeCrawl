@@ -3,9 +3,12 @@ const axios = require('axios');
 const dotenv = require('dotenv');
 const puppeteer = require('puppeteer');
 
+const db = require('./models');
+
 dotenv.config();
 
 const crawler = async () => {
+  await db.sequelize.sync();
   try{
     let browser = await puppeteer.launch({headless: false, args: ['--window-size=1920,1080','--disable-notifications']});
     let page = await browser.newPage();
