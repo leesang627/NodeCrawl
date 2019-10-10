@@ -41,6 +41,7 @@ const crawler = async () => {
         postId,
       }
     });
+    console.log(newPost);
     await page.waitFor(5000);
     const likeBtn = await page.$('[id^=hyperfeed_story_id]:first-child ._666k a');
     await page.evaluate((like) => {
@@ -57,7 +58,6 @@ const crawler = async () => {
       firstFeed.parentNode.removeChild(firstFeed);
     });
     await page.waitFor(5000);
-    console.log(newPost);
   } catch (e) {
     console.error(e);
   }
