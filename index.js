@@ -32,13 +32,31 @@ const crawler = async () => {
       const firstFeed = document.querySelector('[id^=hyperfeed_story_id]:first-child');
       const name = firstFeed.querySelector('.fwb.fcg') && firstFeed.querySelector('.fwb.fcg').textContent;
       const content = firstFeed.querySelector('.userContent') && firstFeed.querySelector('.userContent').textContent;
+      const img = firstFeed.querySelector('[class=mtm] img') && firstFeed.querySelector('[class=mtm] img').src;
       const postId = firstFeed.id.split('_').slice(-1)[0];
       return {
         name,
+        img,
         content,
         postId,
       }
     });
+    await page.waitFor(5000);
+    const likeBtn = await page.$('[id^=hyperfeed_story_id]:first-child ._666k a');
+    await page.evaluate((like) => {
+      const sponsor = document.querySelector('[id^=hyperfeed_story_id]:first-child').textContent.includes('Sponsored');
+      if(!sponsor && like.getAttribute('aria-pressed') === 'false'){
+        like.click();
+      } else if (sponsor && like.getAttribute('aria-pressed') === 'true'){
+        like.click();
+      }
+    }, likeBtn);
+    await page.waitFor(5000);
+    await page.evaluate(() => {
+      const firstFeed = document.querySelector('[id^=hyperfeed_story_id]:first-child');
+      firstFeed.parentNode.removeChild(firstFeed);
+    });
+    await page.waitFor(5000);
     console.log(newPost);
   } catch (e) {
     console.error(e);
